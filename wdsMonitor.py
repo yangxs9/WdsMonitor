@@ -7,7 +7,7 @@ import os
 
 url = 'https://wds.modian.com/ranking_list?pro_id=4135'
 group = 'BEJ48-刘胜男应援会'
-interval = 30
+interval = 10
 
 def getHtml(url):
     req = request.Request(url)
@@ -43,6 +43,7 @@ def getAddedUserMoney(userMoney, newUserMoney):
     addedUserMoney = {}
     for user in newUserMoney:
         if user not in userMoney:
+            #print('new', user)
             addedUserMoney[user] = newUserMoney[user]
         elif userMoney[user] < newUserMoney[user]:
             addedUserMoney[user] = newUserMoney[user] - userMoney[user]
@@ -50,7 +51,7 @@ def getAddedUserMoney(userMoney, newUserMoney):
 
 def qqReport(addedUserMoney, group):
     for user in addedUserMoney: 
-        msg = user + ' 刚刚集资了 ' + str(addedUserMoney[user]) + '元'
+        msg = user + ' 刚刚集资了 ' + str(addedUserMoney[user]) + '元，感谢您对小树的支持！微打赏链接：http://t.cn/RSPzf7Y'
         print(msg)
         cmd = 'qq send group ' + group + ' ' + msg
         os.system(cmd)

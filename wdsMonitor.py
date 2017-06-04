@@ -7,17 +7,22 @@ import os
 
 url = 'https://wds.modian.com/ranking_list?pro_id=4135'
 group = 'BEJ48-刘胜男应援会'
-interval = 10
+interval = 30
 
 def getHtml(url):
     req = request.Request(url)
     req.add_header('User-Agent', 'Mozilla/6.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/8.0 Mobile/10A5376e Safari/8536.25')
-    with request.urlopen(req) as f:
-        if f.status == 200:
-            return f.read().decode('utf-8')
-        else:
-            print('cant get the page')
-            return None
+    try:
+        with request.urlopen(req) as f:
+            if f.status == 200:
+                return f.read().decode('utf-8')
+            else:
+                print('cant get the page')
+                return None
+    except:
+        print('connection error')
+        return None
+    
 
 def getWdsData(html):
     userMoney = {}
@@ -43,7 +48,7 @@ def getAddedUserMoney(userMoney, newUserMoney):
     addedUserMoney = {}
     for user in newUserMoney:
         if user not in userMoney:
-            #print('new', user)
+            print('new user:', user)
             addedUserMoney[user] = newUserMoney[user]
         elif userMoney[user] < newUserMoney[user]:
             addedUserMoney[user] = newUserMoney[user] - userMoney[user]
@@ -61,9 +66,12 @@ def wdsMonitor(url, group, interval):
     while True:
         time.sleep(interval)
         newUserMoney = getUserMoney(url)
+        if newUserMoney == None:
+            continue
         addedUserMoney = getAddedUserMoney(userMoney, newUserMoney)
         if len(addedUserMoney) == 0:
-            print('no change')
+            pass
+            #print('no change')
         else:
             qqReport(addedUserMoney, group)
             userMoney = newUserMoney

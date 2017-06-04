@@ -6,7 +6,8 @@ import time
 import os
 
 url = 'https://wds.modian.com/ranking_list?pro_id=4135'
-group = '空'
+group = 'BEJ48-刘胜男应援会'
+interval = 30
 
 def getHtml(url):
     req = request.Request(url)
@@ -20,7 +21,7 @@ def getHtml(url):
 
 def getWdsData(html):
     userMoney = {}
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     userTags = soup.select('#wrapper_jj .nickname')
     moneyTags = soup.select('#wrapper_jj .money')
     for i in range(len(userTags)):
@@ -41,7 +42,7 @@ def getUserMoney(url):
 def getAddedUserMoney(userMoney, newUserMoney):
     addedUserMoney = {}
     for user in newUserMoney:
-        if userMoney[user] == None:
+        if user not in userMoney:
             addedUserMoney[user] = newUserMoney[user]
         elif userMoney[user] < newUserMoney[user]:
             addedUserMoney[user] = newUserMoney[user] - userMoney[user]
@@ -49,7 +50,7 @@ def getAddedUserMoney(userMoney, newUserMoney):
 
 def qqReport(addedUserMoney, group):
     for user in addedUserMoney: 
-        msg = user + ' 刚刚集资了' + str(addedUserMoney[user]) + '元'
+        msg = user + ' 刚刚集资了 ' + str(addedUserMoney[user]) + '元'
         print(msg)
         cmd = 'qq send group ' + group + ' ' + msg
         os.system(cmd)
@@ -66,4 +67,4 @@ def wdsMonitor(url, group, interval):
             qqReport(addedUserMoney, group)
             userMoney = newUserMoney
 
-wdsMonitor(url, group, 10)
+wdsMonitor(url, group, interval)

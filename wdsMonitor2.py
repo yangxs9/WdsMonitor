@@ -52,7 +52,7 @@ def qqReport(addedUserInfo, group):
     localtime = time.asctime(time.localtime(time.time()))
     for user in addedUserInfo: 
         msg = user + ' 刚刚' + addedUserInfo[user] + '，感谢您对小树的支持！微打赏链接：http://t.cn/RSPzf7Y'    
-        log = localtime ＋ ': ' + msg
+        log = localtime ＋ ': ' + msg + '\n'
         writeLog('log.txt', log)
         cmd = 'qq send group ' + group + ' ' + msg
         os.system(cmd)

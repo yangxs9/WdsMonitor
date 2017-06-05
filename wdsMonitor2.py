@@ -7,7 +7,7 @@ import os
 
 url = 'https://wds.modian.com/show_weidashang_pro/4135#1'
 group = 'BEJ48-刘胜男应援会'
-interval = 60
+interval = 600
 
 def getHtml(url):
     req = request.Request(url)
@@ -41,10 +41,19 @@ def getAddedUserInfo(html, addedNum):
         addedUserInfo[user] = info
     return addedUserInfo
 
+def writeLog(logFile, log):
+    try:  
+        with open(logFile, 'a') as f:
+            f.write(log)
+    except:
+        print('error: log failed')
+
 def qqReport(addedUserInfo, group):
+    localtime = time.asctime(time.localtime(time.time()))
     for user in addedUserInfo: 
-        msg = user + ' 刚刚' + addedUserInfo[user] + '，感谢您对小树的支持！微打赏链接：http://t.cn/RSPzf7Y'
-        print(msg)
+        msg = user + ' 刚刚' + addedUserInfo[user] + '，感谢您对小树的支持！微打赏链接：http://t.cn/RSPzf7Y'    
+        log = localtime ＋ ': ' + msg
+        writeLog('log.txt', log)
         cmd = 'qq send group ' + group + ' ' + msg
         os.system(cmd)
 

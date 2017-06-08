@@ -5,9 +5,9 @@ from bs4 import BeautifulSoup
 import time
 import os
 
-url = 'https://wds.modian.com/show_weidashang_pro/4135#1'
+url = 'https://wds.modian.com/show_weidashang_pro/4559#1'
 group = 'BEJ48-刘胜男应援会'
-interval = 600
+interval = 60
 
 def getHtml(url):
     req = request.Request(url)

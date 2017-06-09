@@ -32,9 +32,9 @@ while True:
         msg = msg + '莉佳集资刚刚增长了' + str(tljWds.addedAmount) + '元\n'
     msg += '【北广暗黑拯救战】唐莉佳x刘胜男联合企划正在进行中，目前比分小树'
     msg = msg + str(lsnWds.amount) + ':' + str(tljWds.amount) + '莉佳\n'
-    if lsnWds.amount < tljWds:
+    if lsnWds.amount < tljWds.amount:
         msg += '暂时落后。'
-    elif lsnWds.amount > tljWds:
+    elif lsnWds.amount > tljWds.amount:
         msg += '暂时领先。'
     else:
         msg += '打平。'

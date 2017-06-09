@@ -57,7 +57,7 @@ class Wds(object):
     def refreshInfo(self):
         self.html = self.getHtml(self.url)
         newAmount = self.getAmount(self.html)
-        if newAmount > self.amount:
+        if newAmount != None and newAmount > self.amount:
             self.isChanged = True
             self.addedAmount = newAmount - self.amount
             self.amount = newAmount
@@ -67,3 +67,5 @@ class Wds(object):
             self.commentsNum = newCommentsNum
         else:
             self.isChanged = False
+            self.addedNum = 0
+            self.addedUserInfo = {}

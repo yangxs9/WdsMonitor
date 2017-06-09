@@ -26,12 +26,12 @@ while True:
     msg = ''
     if lsnWds.isChanged:
         for user in lsnWds.addedUserInfo:
-            msg = msg + user + ' 刚刚支持了小树' + lsnWds.addedUserInfo[user][3:] + '\n'
+            msg = msg + user + ' 刚刚支持了小树' + lsnWds.addedUserInfo[user][3:] + '，'
         msg += '感谢大家的支持！'
     if tljWds.isChanged:
-        msg = msg + '莉佳集资刚刚增长了' + str(tljWds.addedAmount) + '元\n'
+        msg = msg + '莉佳集资刚刚增长了' + str(tljWds.addedAmount) + '元。'
     msg += '【北广暗黑拯救战】唐莉佳x刘胜男联合企划正在进行中，目前比分小树'
-    msg = msg + str(lsnWds.amount) + ':' + str(tljWds.amount) + '莉佳\n'
+    msg = msg + str(lsnWds.amount) + ':' + str(tljWds.amount) + '莉佳'
     if lsnWds.amount < tljWds.amount:
         msg += '暂时落后。'
     elif lsnWds.amount > tljWds.amount:

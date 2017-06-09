@@ -14,6 +14,15 @@ def qqReport(msg, group):
     cmd = 'qq send group ' + group + ' ' + msg
     os.system(cmd)
 
+def writeLog(logFile, msg):
+    try:  
+        with open(logFile, 'a') as f:
+            localtime = time.asctime(time.localtime(time.time()))
+            log = localtime + ': ' + msg + '\n'
+            f.write(log)
+    except:
+        print('error: log failed')
+
 lsnWds = Wds.Wds(lsn_url)
 tljWds = Wds.Wds(tlj_url)
 
@@ -39,4 +48,5 @@ while True:
     else:
         msg += '暂时打平。'
     msg += '为了让小树远离凉茶的威胁，园丁们加油集资吧！微打赏链接：http://t.cn/RSjqqgc'
+    writeLog(logFile, msg)
     qqReport(msg, group)

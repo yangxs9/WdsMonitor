@@ -8,7 +8,8 @@ lsn_url = 'https://wds.modian.com/show_weidashang_pro/4559#1'
 tlj_url = 'https://wds.modian.com/show_weidashang_pro/4558#1'
 group = 'BEJ48-刘胜男应援会'
 #group = '空'
-interval = 100
+interval = 600
+logFile = 'log.txt'
 
 def qqReport(msg, group):
     cmd = 'qq send group ' + group + ' ' + msg

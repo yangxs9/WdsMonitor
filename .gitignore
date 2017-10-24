@@ -1,0 +1,4 @@
+.DS_Store
+deprecated/
+__pycache__/
+test.py

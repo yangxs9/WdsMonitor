@@ -1,0 +1,22 @@
+{
+    "interval": 60,
+    "receivers": [
+        {
+            "qq": "548718867",
+            "main": { "id": "8565", "postId": "17940" ,"name": "小树" },
+            "others": [
+            ],
+            "info": {
+                "project": "金曲大赏三日限定集资", 
+                "goal": 30000,
+                "start": "biu biu biu～",
+                "end": "一起加油让小树站上她所喜爱的大舞台吧！"
+            },
+            "options": {
+                "total": true,
+                "rank": true,
+                "top": false
+            }
+        }
+    ]
+}

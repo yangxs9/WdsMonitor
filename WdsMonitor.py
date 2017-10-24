@@ -1,16 +1,21 @@
-#! usr/bin/python #coding=utf-8
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import requests
 from bs4 import BeautifulSoup
 import time
-from datetime import datetime, timedelta, timezone
 import os
-
+from cqsdk import CQBot, CQAt, CQImage, RcvdPrivateMessage, RcvdGroupMessage, SendGroupMessage, GetGroupMemberList, RcvGroupMemberList
 
 class Monitor(object):
 
     def __init__(self, receivers):
         self.receivers = receivers
+        qqbot = CQBot(11235)
+        qqbot.start()
+        qqbot.send(SendGroupMessage("21070782", "test"))
+        print("QQBot is running...")
+
 
     def run(self, interval):
         print('start')

@@ -1,7 +1,9 @@
-from WdsMonitor import WdsClient, Receiver, Monitor, leftTime
-import requests
-import time
-from datetime import datetime, timedelta, timezone
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import json
+from WdsMonitor import WdsClient, Receiver, Monitor
+
 
 def loadConfig(file='./config.json'):
     with open('config.json', 'r') as file:

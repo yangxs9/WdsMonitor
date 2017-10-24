@@ -1,4 +1,5 @@
-#! usr/bin/python #coding=utf-8
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import json
 from WdsMonitor import BasicClient, WdsClient, Receiver, Monitor

@@ -1,7 +1,7 @@
-#! usr/bin/python #coding=utf-8
-
-import json
-from WdsMonitor import BasicClient, WdsClient, Receiver, Monitor
+from WdsMonitor import WdsClient, Receiver, Monitor, leftTime
+import requests
+import time
+from datetime import datetime, timedelta, timezone
 
 def loadConfig(file='./config.json'):
     with open('config.json', 'r') as file:
@@ -21,4 +21,4 @@ def loadConfig(file='./config.json'):
     monitor = Monitor(receivers)
     monitor.run(config['interval'])
 
-loadConfig()
+loadConfig('./test.json')

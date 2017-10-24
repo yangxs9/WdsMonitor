@@ -1,6 +1,9 @@
+#! usr/bin/python #coding=utf-8
+
 import requests
 from bs4 import BeautifulSoup
 import time
+from datetime import datetime, timedelta, timezone
 import os
 
 
@@ -40,9 +43,10 @@ class Receiver(object):
         message = messager(self.mainClient, self.otherClients, self.info, self.options)
         if message != None:
             print(message)
-        message = "'" + message + "'"
-        cmd = 'qq send group ' + self.qq + ' ' + message
-        os.system(cmd)
+            message = "'" + message + "'"
+            cmd = 'qq send group ' + self.qq + ' ' + message
+            # cmd = 'qq send buddy 407190960 ' + message
+            os.system(cmd)
 
     def defaultMessager(self, mainClient, otherClients, info, options):
         message = info['start']
@@ -62,14 +66,18 @@ class Receiver(object):
         message += '目前金额' + str(mainClient.amount) + '元，'
         if mainClient.amount < info['goal']:
             message += '离目标' + str(info['goal']) + '还差' + str(round(info['goal'] - mainClient.amount,2)) + '元，'
-        message += '参加人数' + str(mainClient.peopleNum) + '，'
-        message += '距离本次活动结束还有' + str(mainClient.time) + '。\n'
+        message += '参加人数' + str(mainClient.peopleNum) + '，'   
+        leftTime = self.leftTime(info['due'])
+        if leftTime:
+            message += '距离本次活动结束还剩' + leftTime + '。\n'
+        else:
+            message += '本次活动已结束，感谢大家的参与！'
         
         if options['top'] and mainClient.rank != None and len(mainClient.rank) > 0:
             message += '聚聚榜Top10：'
             length = min(10, len(mainClient.rank))
             for i in range(length):
-                message += str(i + 1) + '.' + mainClient.rank[i][1] + ': ' + str(mainClient.rank[i][0]) + ','
+                message += str(i + 1) + '.' + mainClient.rank[i][1] + ': ' + str(mainClient.rank[i][0]) + ', '
             message += '\n'
 
         if len(otherClients) > 0:
@@ -80,6 +88,23 @@ class Receiver(object):
 
         message += info['end']
         return message
+
+    def leftTime(self, due):
+        now = time.time()
+        leftSeconds = due - now
+        if leftSeconds < 0:
+            return False
+        days = int(leftSeconds / (3600 * 24))
+        leftSeconds = leftSeconds % (3600 * 24)
+        hours = int(leftSeconds / 3600)
+        leftSeconds = leftSeconds % 3600
+        minutes = int(leftSeconds / 60)
+        if days != 0:
+            return str(days) + '天' + str(hours) + '小时' + str(minutes) + '分钟'
+        elif hours != 0:
+            return str(hours) + '小时' + str(minutes) + '分钟'
+        else:
+            return str(minutes) + '分钟'
 
 
 class BasicClient(object):

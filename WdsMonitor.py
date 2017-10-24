@@ -27,7 +27,7 @@ class Receiver(object):
         self.options = options
 
     def check(self):
-        print('checking for', self.qq)
+        # print('checking for', self.qq)
         isRank = self.options['total'] or self.options['rank'] or self.options['top']
         if self.mainClient.updated(isRank):
             for client in self.otherClients:
@@ -40,9 +40,9 @@ class Receiver(object):
         message = messager(self.mainClient, self.otherClients, self.info, self.options)
         if message != None:
             print(message)
-        # message = "'" + message + "'"
-        # cmd = 'qq send group ' + self.qq + ' ' + message
-        # os.system(cmd)
+        message = "'" + message + "'"
+        cmd = 'qq send group ' + self.qq + ' ' + message
+        os.system(cmd)
 
     def defaultMessager(self, mainClient, otherClients, info, options):
         message = info['start']

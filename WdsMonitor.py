@@ -167,7 +167,7 @@ class BasicClient(object):
     def getHtml(self):
         url = 'https://wds.modian.com/show_weidashang_pro/' + self.id
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=10)
             return response.text
         except:
             print("Error: can't get html.")
@@ -240,10 +240,10 @@ class WdsClient(BasicClient):
             'pro_id': self.id
         }
         try:
-            response = requests.post(url, data=params)
+            response = requests.post(url, data=params, timeout=10)
             return response.json()['data']['html']
         except:
-            print("Error: can't get rank html.")
+            print("Error: can't get comment html.")
             return None
 
     def getAddedUserMoney(self, html, addedAmount):
@@ -280,7 +280,7 @@ class WdsClient(BasicClient):
             'page_size':50,
         }
         try:
-            response = requests.post(url, data=params)
+            response = requests.post(url, data=params, timeout=10)
             return response.json()['data']['html']
         except:
             print("Error: can't get rank html.")

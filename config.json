@@ -1,5 +1,6 @@
 {
     "interval": 60,
+    "isCoolQ": false,
     "receivers": [
         {
             "qq": "548718867",
@@ -11,7 +12,7 @@
                 "goal": 30000,
                 "due": 1509109020,
                 "start": "biu biu biu～",
-                "end": "一起加油让小树站上她所热爱的大舞台吧！"
+                "end": "一起加油让小树站上她所热爱的大舞台吧！微打赏链接：https://wds.modian.com/show_weidashang_pro/8565"
             },
             "options": {
                 "total": true,

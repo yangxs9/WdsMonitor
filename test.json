@@ -1,5 +1,6 @@
 {
     "interval": 60,
+    "isCoolQ": false,
     "receivers": [
         {
             "qq": "21070782",

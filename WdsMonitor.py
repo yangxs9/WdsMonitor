@@ -1,28 +1,61 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import json
 import requests
 from bs4 import BeautifulSoup
 import time
 import os
 from cqsdk import CQBot, CQAt, CQImage, RcvdPrivateMessage, RcvdGroupMessage, SendGroupMessage, GetGroupMemberList, RcvGroupMemberList
 
+
+def run(file='./config.json'):
+    with open(file, 'r') as file:
+        config = json.load(file)
+    
+    receivers = []
+    for receiver in config['receivers']:
+        main = receiver['main']
+        mainClient = WdsClient(main['id'], main['postId'], main['name'])
+        # html = mainClient.getCommentHtml()
+        # print(mainClient.getAddedUserMoney(html,1400))
+        otherClients = []
+        for other in receiver['others']:
+            otherClients.append(BasicClient(other['id'], other['name']))
+        receivers.append(Receiver(receiver['qq'], mainClient, otherClients, receiver['info'], receiver['options']))
+
+    monitor = Monitor(receivers, config['isCoolQ'])
+    monitor.run(config['interval'])
+
+
 class Monitor(object):
 
-    def __init__(self, receivers):
+    def __init__(self, receivers, isCoolQ):
         self.receivers = receivers
-        qqbot = CQBot(11235)
-        qqbot.start()
-        qqbot.send(SendGroupMessage("21070782", "test"))
-        print("QQBot is running...")
-
+        self.isCoolQ = isCoolQ
+        if self.isCoolQ:
+            self.qqbot = CQBot(11235)
+            self.qqbot.start()
+            self.qqbot.send(SendGroupMessage("21070782", "test"))
+            print("QQBot is running...")
 
     def run(self, interval):
         print('start')
         while True:
             time.sleep(interval)
             for receiver in self.receivers:
-                receiver.check()
+                message = receiver.getMessage()
+                if message != None:
+                    self.send(receiver.qq, message)
+
+    def send(self, qq, message):
+        print(message)
+        if self.isCoolQ:
+            self.qqbot.send(SendGroupMessage(qq, message))
+        else:
+            message = "'" + message + "'"
+            cmd = 'qq send group ' + self.qq + ' ' + message
+            # cmd = 'qq send buddy 407190960 ' + message
+            os.system(cmd)
 
 
 class Receiver(object):
@@ -34,24 +67,15 @@ class Receiver(object):
         self.info = info
         self.options = options
 
-    def check(self):
-        # print('checking for', self.qq)
+    def getMessage(self, messager=None):
         isRank = self.options['total'] or self.options['rank'] or self.options['top']
         if self.mainClient.updated(isRank):
             for client in self.otherClients:
                 client.updated()
-            self.send()
-
-    def send(self, messager=None):
-        if messager == None:
-            messager = self.defaultMessager
-        message = messager(self.mainClient, self.otherClients, self.info, self.options)
-        if message != None:
-            print(message)
-            message = "'" + message + "'"
-            cmd = 'qq send group ' + self.qq + ' ' + message
-            # cmd = 'qq send buddy 407190960 ' + message
-            os.system(cmd)
+            if messager == None:
+                messager = self.defaultMessager
+            return messager(self.mainClient, self.otherClients, self.info, self.options)
+        return None
 
     def defaultMessager(self, mainClient, otherClients, info, options):
         message = info['start']

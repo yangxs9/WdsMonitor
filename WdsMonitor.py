@@ -16,8 +16,6 @@ def run(file='./config.json'):
     for receiver in config['receivers']:
         main = receiver['main']
         mainClient = WdsClient(main['id'], main['postId'], main['name'])
-        # html = mainClient.getCommentHtml()
-        # print(mainClient.getAddedUserMoney(html,1400))
         otherClients = []
         for other in receiver['others']:
             otherClients.append(BasicClient(other['id'], other['name']))
@@ -35,7 +33,7 @@ class Monitor(object):
         if self.isCoolQ:
             self.qqbot = CQBot(11235)
             self.qqbot.start()
-            self.qqbot.send(SendGroupMessage("21070782", "test"))
+            # self.qqbot.send(SendGroupMessage("21070782", "test"))
             print("QQBot is running...")
 
     def run(self, interval):
@@ -43,9 +41,10 @@ class Monitor(object):
         while True:
             time.sleep(interval)
             for receiver in self.receivers:
-                message = receiver.getMessage()
-                if message != None:
-                    self.send(receiver.qq, message)
+                messages = receiver.getMessages()
+                if messages != None:
+                    for msg in messages:
+                        self.send(receiver.qq, msg)
 
     def send(self, qq, message):
         print(message)
@@ -53,7 +52,7 @@ class Monitor(object):
             self.qqbot.send(SendGroupMessage(qq, message))
         else:
             message = "'" + message + "'"
-            cmd = 'qq send group ' + self.qq + ' ' + message
+            cmd = 'qq send group ' + qq + ' ' + message
             # cmd = 'qq send buddy 407190960 ' + message
             os.system(cmd)
 
@@ -67,7 +66,7 @@ class Receiver(object):
         self.info = info
         self.options = options
 
-    def getMessage(self, messager=None):
+    def getMessages(self, messager=None):
         isRank = self.options['total'] or self.options['rank'] or self.options['top']
         if self.mainClient.updated(isRank):
             for client in self.otherClients:
@@ -78,6 +77,7 @@ class Receiver(object):
         return None
 
     def defaultMessager(self, mainClient, otherClients, info, options):
+        messages = []
         message = info['start']
         for user, money in mainClient.addedUserMoney.items():
             message += user + '刚刚支持了' + str(money) + '元，'
@@ -116,7 +116,9 @@ class Receiver(object):
             message += '\n'
 
         message += info['end']
-        return message
+        messages.append(message)
+        messages.append(info['link'])
+        return messages
 
     def leftTime(self, due):
         now = time.time()
@@ -219,6 +221,7 @@ class WdsClient(BasicClient):
         if html == None or commentHtml == None:
             return False
         newAmount = self.getAmount(html)
+        print(self.name, newAmount)
         if newAmount != None and newAmount > self.amount:
             self.addedAmount = round(newAmount - self.amount, 2)
             self.addedUserMoney = self.getAddedUserMoney(commentHtml, self.addedAmount)

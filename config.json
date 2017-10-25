@@ -4,7 +4,11 @@
     "receivers": [
         {
             "qq": "548718867",
-            "main": { "id": "8565", "postId": "17940" ,"name": "小树" },
+            "main": { 
+                "id": "8565", 
+                "postId": "17940",
+                "name": "小树" 
+            },
             "others": [
             ],
             "info": {

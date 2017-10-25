@@ -4,25 +4,9 @@ import json
 import requests
 from bs4 import BeautifulSoup
 import time
+import sys
 import os
 from cqsdk import CQBot, CQAt, CQImage, RcvdPrivateMessage, RcvdGroupMessage, SendGroupMessage, GetGroupMemberList, RcvGroupMemberList
-
-
-def run(file='./config.json'):
-    with open(file, 'r') as file:
-        config = json.load(file)
-    
-    receivers = []
-    for receiver in config['receivers']:
-        main = receiver['main']
-        mainClient = WdsClient(main['id'], main['postId'], main['name'])
-        otherClients = []
-        for other in receiver['others']:
-            otherClients.append(BasicClient(other['id'], other['name']))
-        receivers.append(Receiver(receiver['qq'], mainClient, otherClients, receiver['info'], receiver['options']))
-
-    monitor = Monitor(receivers, config['isCoolQ'])
-    monitor.run(config['interval'])
 
 
 class Monitor(object):
@@ -344,6 +328,32 @@ class WdsClient(BasicClient):
             print("Error: can't convert moneyStr.")
             return None
 
+
+def run(file='./config.json'):
+    with open(file, 'r') as file:
+        config = json.load(file)
+    
+    receivers = []
+    for receiver in config['receivers']:
+        main = receiver['main']
+        mainClient = WdsClient(main['id'], main['postId'], main['name'])
+        otherClients = []
+        for other in receiver['others']:
+            otherClients.append(BasicClient(other['id'], other['name']))
+        receivers.append(Receiver(receiver['qq'], mainClient, otherClients, receiver['info'], receiver['options']))
+
+    monitor = Monitor(receivers, config['isCoolQ'])
+    monitor.run(config['interval'])
+
+
+if __name__ == '__main__':
+    if len(sys.argv) == 1:
+        run()
+    elif len(sys.argv) == 2:
+        run(sys.argv[1])
+    else:
+        print("Usage: python3 WdsMonitor.py file")
+    
 
 
 

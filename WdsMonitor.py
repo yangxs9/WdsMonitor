@@ -153,7 +153,8 @@ class BasicClient(object):
     def getHtml(self):
         url = 'https://wds.modian.com/show_weidashang_pro/' + self.id
         try:
-            response = requests.get(url, timeout=10)
+            headers={'Accepat':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8','Accept-Language':'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4','User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36'}
+            response = requests.get(url, headers=headers, timeout=10)
             return response.text
         except:
             print("Error: can't get html.")
@@ -227,7 +228,8 @@ class WdsClient(BasicClient):
             'pro_id': self.id
         }
         try:
-            response = requests.post(url, data=params, timeout=10)
+            headers={'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8','Accept-Language':'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4','User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36'}
+            response = requests.post(url, data=params, headers=headers, timeout=10)
             return response.json()['data']['html']
         except:
             print("Error: can't get comment html.")
@@ -267,7 +269,8 @@ class WdsClient(BasicClient):
             'page_size':50,
         }
         try:
-            response = requests.post(url, data=params, timeout=10)
+            headers={'Accepat':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8','Accept-Language':'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4','User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36'}
+            response = requests.post(url, data=params, headers=headers, timeout=10)
             return response.json()['data']['html']
         except:
             print("Error: can't get rank html.")
@@ -330,7 +333,7 @@ class WdsClient(BasicClient):
 
 
 def run(file='./config.json'):
-    with open(file, 'r') as file:
+    with open(file, 'r', encoding="utf-8") as file:
         config = json.load(file)
     
     receivers = []

@@ -1,5 +1,5 @@
 {
-    "interval": 60,
+    "interval": 180,
     "isCoolQ": false,
     "receivers": [
         {

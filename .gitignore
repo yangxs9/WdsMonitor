@@ -3,3 +3,4 @@ deprecated/
 __pycache__/
 test.py
 api.chls
+api.txt

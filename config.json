@@ -5,21 +5,22 @@
         {
             "qq": "548718867",
             "main": { 
-                "id": "8565", 
-                "postId": "17940",
+                "id": "8662", 
+                "postId": "18108",
                 "name": "小树" 
             },
             "others": [
             ],
             "info": {
-                "project": "金曲大赏三日限定集资", 
-                "goal": 30000,
-                "due": 1509109020,
+                "project": "金曲大赏计划第一期", 
+                "goal": 8909,
+                "due": 1510808400,
                 "start": "biu biu biu～",
                 "end": "一起加油让小树站上她所热爱的大舞台吧！",
-                "link": "微打赏链接：https://wds.modian.com/show_weidashang_pro/8565"
+                "link": "微打赏链接：https://wds.modian.com/show_weidashang_pro/8662"
             },
             "options": {
+                "days": true,
                 "total": true,
                 "rank": true,
                 "top": true

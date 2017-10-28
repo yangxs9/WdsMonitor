@@ -51,7 +51,7 @@ class Receiver(object):
         self.options = options
 
     def getMessages(self, messager=None):
-        isRank = self.options['total'] or self.options['rank'] or self.options['top']
+        isRank = self.options['total'] or self.options['rank'] or self.options['top'] or self.options['days']
         if self.mainClient.updated(isRank):
             for client in self.otherClients:
                 client.updated()
@@ -65,6 +65,10 @@ class Receiver(object):
         message = info['start']
         for user, money in mainClient.addedUserMoney.items():
             message += user + '刚刚支持了' + str(money) + '元，'
+            if options['days']:
+                days = mainClient.getDays(user)
+                if days != None:
+                    message += '累积打卡' + str(days) + '，'
             if options['total']:
                 total = mainClient.getTotal(user)
                 if total != None:
@@ -198,6 +202,7 @@ class WdsClient(BasicClient):
         self.postId = postId
         self.addedUserMoney = {}
         self.userMoney = {}
+        self.userDays = {}
         self.rank = []
 
     def updated(self, isRank):
@@ -216,6 +221,7 @@ class WdsClient(BasicClient):
                 self.time = self.getTime(html)
                 if isRank:
                     self.userMoney = self.getUserMoney()
+                    self.userDays = self.getUserDays()
                     self.rank = self.getRank(self.userMoney)
                 return True
         return False
@@ -260,11 +266,11 @@ class WdsClient(BasicClient):
             print('Error: cant get addedUserMoney.')
             return None
         
-    def getRankHtml(self):
+    def getRankHtml(self, type):
         url = 'https://wds.modian.com/ajax/backer_ranking_list'
         params = {
             'pro_id': self.id,
-            'type':1,
+            'type':type,
             'page':1,
             'page_size':50,
         }
@@ -277,7 +283,7 @@ class WdsClient(BasicClient):
             return None
 
     def getUserMoney(self):
-        html = self.getRankHtml()
+        html = self.getRankHtml(1)
         if html == None:
             return None
         try:
@@ -294,11 +300,35 @@ class WdsClient(BasicClient):
             print("Error: can't get userMoney.")
             return None
 
+    def getUserDays(self):
+        html = self.getRankHtml(2)
+        if html == None:
+            return None
+        try:
+            soup = BeautifulSoup(html, 'html.parser')
+            userTags = soup.select('.nickname')
+            daysTags = soup.select('.money')
+            userDays = {}
+            for i in range(len(userTags)):
+                user = userTags[i].string
+                userDays[user] = daysTags[i].string
+            return userDays
+        except:
+            print("Error: can't get userDays.")
+            return None
+
     def getTotal(self, user):
         if self.userMoney == None:
             return None
         if user in self.userMoney:
             return self.userMoney[user]
+        return None
+
+    def getDays(self, user):
+        if self.userDays == None:
+            return None
+        if user in self.userDays:
+            return self.userDays[user]
         return None
 
     def getRank(self, userMoney):

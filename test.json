@@ -1,5 +1,5 @@
 {
-    "interval": 60,
+    "interval": 30,
     "isCoolQ": false,
     "receivers": [
         {
@@ -16,6 +16,7 @@
                 "link": "微打赏链接：https://wds.modian.com/show_weidashang_pro/8565"
             },
             "options": {
+                "days": true,
                 "total": true,
                 "rank": true,
                 "top": true

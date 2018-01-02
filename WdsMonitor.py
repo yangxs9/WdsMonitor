@@ -43,20 +43,21 @@ class Monitor(object):
 
 class Receiver(object):
 
-    def __init__(self, qq, mainClient, otherClients, info, options):
+    def __init__(self, qq, mainClient, otherClients, info, options, messager=None):
         self.qq = qq
         self.mainClient = mainClient
         self.otherClients = otherClients
+        self.messager = messager
         self.info = info
         self.options = options
 
-    def getMessages(self, messager=None):
-        isRank = self.options['total'] or self.options['rank'] or self.options['top'] or self.options['days']
-        if self.mainClient.updated(isRank):
+    def getMessages(self):
+        # isRank = self.options['total'] or self.options['rank'] or self.options['top'] or self.options['days']
+        # isGame = self.options['game']
+        if self.mainClient.updated(self.options):
             for client in self.otherClients:
                 client.updated()
-            if messager == None:
-                messager = self.defaultMessager
+            messager = self.messager if self.messager != None else self.defaultMessager
             return messager(self.mainClient, self.otherClients, self.info, self.options)
         return None
 
@@ -88,7 +89,7 @@ class Receiver(object):
         if leftTime:
             message += '距离本次活动结束还剩' + leftTime + '。\n'
         else:
-            message += '本次活动已结束，感谢大家的参与！'
+            message += '本次活动已结束，感谢大家的参与！\n'
         
         if options['top'] and mainClient.rank != None and len(mainClient.rank) > 0:
             message += '聚聚榜Top10：'
@@ -104,8 +105,9 @@ class Receiver(object):
             message += '\n'
 
         message += info['end']
+        message += "微打赏链接：" + info['link']
         messages.append(message)
-        messages.append(info['link'])
+        # messages.append("微打赏链接：" + info['link'])
         return messages
 
     def leftTime(self, due):
@@ -152,7 +154,6 @@ class BasicClient(object):
             self.time = self.getTime(html)
             return True
         return False
-
 
     def getHtml(self):
         url = 'https://wds.modian.com/show_weidashang_pro/' + self.id
@@ -205,7 +206,16 @@ class WdsClient(BasicClient):
         self.userDays = {}
         self.rank = []
 
-    def updated(self, isRank):
+        # for game
+        fileName = id + "_left.json"
+        if (os.path.exists(fileName)):
+            with open(fileName, 'r', encoding="utf-8") as file:
+                self.userLeft = json.load(file)
+        else:
+            self.userLeft = {}
+        self.userGameTimes = {}
+
+    def updated(self, options):
         html = self.getHtml()
         commentHtml = self.getCommentHtml()
         if html == None or commentHtml == None:
@@ -219,10 +229,12 @@ class WdsClient(BasicClient):
                 self.amount = newAmount
                 self.peopleNum = self.getPeopleNum(html)
                 self.time = self.getTime(html)
-                if isRank:
+                if options['total'] or options['rank'] or options['top'] or options['days']:
                     self.userMoney = self.getUserMoney()
                     self.userDays = self.getUserDays()
                     self.rank = self.getRank(self.userMoney)
+                if options['game']:
+                    self.userGameTimes = self.getGameTimes(options['gameUnit'])
                 return True
         return False
 
@@ -235,7 +247,7 @@ class WdsClient(BasicClient):
         }
         try:
             headers={'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8','Accept-Language':'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4','User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36'}
-            response = requests.post(url, data=params, headers=headers, timeout=10)
+            response = requests.post(url, data=params, headers=headers, timeout=20)
             return response.json()['data']['html']
         except:
             print("Error: can't get comment html.")
@@ -266,52 +278,64 @@ class WdsClient(BasicClient):
             print('Error: cant get addedUserMoney.')
             return None
         
-    def getRankHtml(self, type):
+    def getRankHtml(self, type, page=1):
         url = 'https://wds.modian.com/ajax/backer_ranking_list'
         params = {
             'pro_id': self.id,
-            'type':type,
-            'page':1,
-            'page_size':50,
+            'type': type,
+            'page': page,
+            'page_size': 20,
         }
         try:
             headers={'Accepat':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8','Accept-Language':'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4','User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36'}
-            response = requests.post(url, data=params, headers=headers, timeout=10)
+            response = requests.post(url, data=params, headers=headers, timeout=60)
             return response.json()['data']['html']
         except:
             print("Error: can't get rank html.")
             return None
 
     def getUserMoney(self):
-        html = self.getRankHtml(1)
-        if html == None:
-            return None
         try:
-            soup = BeautifulSoup(html, 'html.parser')
-            userTags = soup.select('.nickname')
-            moneyTags = soup.select('.money')
             userMoney = {}
-            for i in range(len(userTags)):
-                user = userTags[i].string
-                moneyStr = moneyTags[i].string
-                userMoney[user] = self.moneyNum(moneyStr)
+            page = 1
+            isDone = False
+            while not isDone:
+                html = self.getRankHtml(1, page)
+                if html == None:
+                    break
+                page += 1
+
+                soup = BeautifulSoup(html, 'html.parser')
+                userTags = soup.select('.nickname')
+                moneyTags = soup.select('.money')
+                
+                for i in range(len(userTags)):
+                    user = userTags[i].string
+                    moneyStr = moneyTags[i].string
+                    userMoney[user] = self.moneyNum(moneyStr)
             return userMoney
         except:
             print("Error: can't get userMoney.")
             return None
 
     def getUserDays(self):
-        html = self.getRankHtml(2)
-        if html == None:
-            return None
         try:
-            soup = BeautifulSoup(html, 'html.parser')
-            userTags = soup.select('.nickname')
-            daysTags = soup.select('.money')
             userDays = {}
-            for i in range(len(userTags)):
-                user = userTags[i].string
-                userDays[user] = daysTags[i].string
+            page = 1
+            isDone = False
+            while not isDone:
+                html = self.getRankHtml(2, page)
+                if html == None:
+                    break
+                page += 1
+
+                soup = BeautifulSoup(html, 'html.parser')
+                userTags = soup.select('.nickname')
+                daysTags = soup.select('.money')
+                
+                for i in range(len(userTags)):
+                    user = userTags[i].string
+                    userDays[user] = daysTags[i].string
             return userDays
         except:
             print("Error: can't get userDays.")
@@ -361,31 +385,52 @@ class WdsClient(BasicClient):
             print("Error: can't convert moneyStr.")
             return None
 
+    def getGameTimes(self, unit):
+        gameTimes = {}
+        if len(self.userLeft) == 0:
+            self.userLeft = self.userMoney
+        else:
+            for user in self.addedUserMoney:
+                self.userLeft[user] += self.addedUserMoney[user]
 
-def run(file='./config.json'):
-    with open(file, 'r', encoding="utf-8") as file:
-        config = json.load(file)
+        for user in self.addedUserMoney:
+            gameTimes[user] = 0
+            while self.userLeft[user] >= unit:
+                gameTimes[user] += 1
+                self.userLeft[user] -= unit
+
+        fileName = self.id + "_left.json"
+        with open(fileName, 'w', encoding="utf-8") as file:
+            file.write(json.dumps(self.userLeft))
+
+        return gameTimes
+
+
+
+# def run(file='./config.json'):
+#     with open(file, 'r', encoding="utf-8") as file:
+#         config = json.load(file)
     
-    receivers = []
-    for receiver in config['receivers']:
-        main = receiver['main']
-        mainClient = WdsClient(main['id'], main['postId'], main['name'])
-        otherClients = []
-        for other in receiver['others']:
-            otherClients.append(BasicClient(other['id'], other['name']))
-        receivers.append(Receiver(receiver['qq'], mainClient, otherClients, receiver['info'], receiver['options']))
+#     receivers = []
+#     for receiver in config['receivers']:
+#         main = receiver['main']
+#         mainClient = WdsClient(main['id'], main['postId'], main['name'])
+#         otherClients = []
+#         for other in receiver['others']:
+#             otherClients.append(BasicClient(other['id'], other['name']))
+#         receivers.append(Receiver(receiver['qq'], mainClient, otherClients, receiver['info'], receiver['options']))
 
-    monitor = Monitor(receivers, config['isCoolQ'])
-    monitor.run(config['interval'])
+#     monitor = Monitor(receivers, config['isCoolQ'])
+#     monitor.run(config['interval'])
 
 
-if __name__ == '__main__':
-    if len(sys.argv) == 1:
-        run()
-    elif len(sys.argv) == 2:
-        run(sys.argv[1])
-    else:
-        print("Usage: python3 WdsMonitor.py file")
+# if __name__ == '__main__':
+#     if len(sys.argv) == 1:
+#         run()
+#     elif len(sys.argv) == 2:
+#         run(sys.argv[1])
+#     else:
+#         print("Usage: python3 WdsMonitor.py file")
     
 
 

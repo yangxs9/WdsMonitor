@@ -1,29 +1,31 @@
 {
-    "interval": 180,
+    "interval": 30,
     "isCoolQ": false,
     "receivers": [
         {
             "qq": "548718867",
             "main": { 
-                "id": "8662", 
-                "postId": "18108",
-                "name": "小树" 
+                "id": "10354", 
+                "postId": "21281",
+                "name": "小树"
             },
             "others": [
             ],
             "info": {
-                "project": "金曲大赏计划第一期", 
-                "goal": 8909,
-                "due": 1510894800,
-                "start": "biu biu biu～",
-                "end": "一起加油让小树站上她所热爱的大舞台吧！",
-                "link": "微打赏链接：https://wds.modian.com/show_weidashang_pro/8662"
+                "project": "一月日常集资 & 千秋乐、首演集资", 
+                "goal": 5000,
+                "due": 1516945800,
+                "start": "",
+                "end": "对这个温柔对待世界的偶像，希望各位能回报以温柔，一起来成为舞台精灵的底气吧～",
+                "link": "https://wds.modian.com/show_weidashang_pro/10354"
             },
             "options": {
                 "days": true,
                 "total": true,
-                "rank": true,
-                "top": true
+                "rank": false,
+                "top": false,
+                "game": 0,
+                "gameUnit": 1000
             }
         }
     ]

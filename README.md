@@ -25,7 +25,7 @@ WdsMonitor is an application that checks updates for projects on [微打赏](htt
 先运行qqbot或酷q
 
 ```
-python WdsMonitor.py config.json
+python monitor.py config.json
 ```
 
 使用json文件传入参数，示例说明：

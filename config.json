@@ -1,5 +1,5 @@
 {
-    "interval": 30,
+    "interval": 180,
     "isCoolQ": false,
     "receivers": [
         {
@@ -24,7 +24,7 @@
                 "total": true,
                 "rank": false,
                 "top": false,
-                "game": 0,
+                "game": false,
                 "gameUnit": 1000
             }
         }
